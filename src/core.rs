@@ -237,8 +237,26 @@ pub fn format_diff_to_string(value: &Value, indent: usize) -> String {
             
             let mut result = String::from("{\n");
             let mut first = true;
+
+            if let Some(idx_val) = obj.get("idx") {
+                result.push_str(&" ".repeat(indent + 2));
+                result.push_str(&format!("\"idx\":", ));
+                
+                let val_str = format_diff_to_string(idx_val, indent + 2);
+                if val_str.contains('\n') {
+                    result.push_str(&format!(" {}", val_str));
+                } else {
+                    result.push_str(&format!(" {}", val_str));
+                }
+                
+                first = false;
+            }
             
             for (key, val) in obj {
+                if key == "idx" {
+                    continue;
+                }
+                
                 if !first {
                     result.push_str(",\n");
                 }
