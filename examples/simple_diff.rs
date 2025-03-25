@@ -33,9 +33,8 @@ fn main() {
     // Parse JSON
     let before: Value = serde_json::from_str(before_json).unwrap();
     let after: Value = serde_json::from_str(after_json).unwrap();
-
     // Compare JSON structures
-    let diff = compare_json(&before, &after);
+    let diff = compare_json(&before, &after, None);
 
     // Format the result
     let formatted = format_diff_to_string(&diff, 0);

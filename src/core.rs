@@ -9,13 +9,16 @@ use std::collections::HashSet;
 /// # Arguments
 /// * `before` - The original JSON structure
 /// * `after` - The modified JSON structure
+/// * `add_idx` - Optional parameter to add auto-incremental index field to objects in arrays
 ///
 /// # Returns
 /// A Value object representing the differences with:
 /// * Added elements marked with `[+]`
 /// * Deleted elements marked with `[-]`
 /// * Changed values shown as `"old" => "new"`
-pub fn compare_json(before: &Value, after: &Value) -> Value {
+pub fn compare_json(before: &Value, after: &Value, add_idx: Option<bool>) -> Value {
+    let add_indexes = add_idx.unwrap_or(false);
+    
     match (before, after) {
         // Compare objects
         (Value::Object(before_obj), Value::Object(after_obj)) => {
@@ -50,7 +53,7 @@ pub fn compare_json(before: &Value, after: &Value) -> Value {
                                     if b_val == a_val {
                                         result.insert(key, b_val.clone());
                                     } else {
-                                        result.insert(key, compare_json(b_val, a_val));
+                                        result.insert(key, compare_json(b_val, a_val, Some(add_indexes)));
                                     }
                                 },
                                 (Some(b_val), None) => {
@@ -83,7 +86,7 @@ pub fn compare_json(before: &Value, after: &Value) -> Value {
                         if b_val == a_val {
                             result.insert(key, b_val.clone());
                         } else {
-                            result.insert(key, compare_json(b_val, a_val));
+                            result.insert(key, compare_json(b_val, a_val, Some(add_indexes)));
                         }
                     },
                     (Some(b_val), None) => {
@@ -104,6 +107,7 @@ pub fn compare_json(before: &Value, after: &Value) -> Value {
             let mut result = Vec::new();
             let mut matched_indices = vec![false; after_arr.len()];
             let similarity_threshold = 0.75;
+            let mut object_index = 0;
             
             // Process elements from before_arr
             for before_item in before_arr {
@@ -138,10 +142,30 @@ pub fn compare_json(before: &Value, after: &Value) -> Value {
                     if let Some(idx) = best_match_idx {
                         // Found a match
                         matched_indices[idx] = true;
-                        result.push(compare_json(before_item, &after_arr[idx]));
+                        let mut compared = compare_json(before_item, &after_arr[idx], Some(add_indexes));
+                        
+                        // Add idx field if requested
+                        if add_indexes {
+                            if let Value::Object(obj) = &mut compared {
+                                obj.insert("idx".to_string(), Value::Number(serde_json::Number::from(object_index)));
+                            }
+                        }
+                        
+                        result.push(compared);
+                        object_index += 1;
                     } else {
                         // Element was deleted
-                        result.push(mark_deleted(before_item.clone()));
+                        let mut deleted = mark_deleted(before_item.clone());
+                        
+                        // Add idx field if requested
+                        if add_indexes {
+                            if let Value::Object(obj) = &mut deleted {
+                                obj.insert("idx".to_string(), Value::Number(serde_json::Number::from(object_index)));
+                            }
+                        }
+                        
+                        result.push(deleted);
+                        object_index += 1;
                     }
                 } else {
                     // Not an object, look for exact match
@@ -162,7 +186,17 @@ pub fn compare_json(before: &Value, after: &Value) -> Value {
             for (i, after_item) in after_arr.iter().enumerate() {
                 if !matched_indices[i] {
                     // This is a new element
-                    result.push(mark_added(after_item.clone()));
+                    let mut added = mark_added(after_item.clone());
+                    
+                    // Add idx field if requested and it's an object
+                    if add_indexes {
+                        if let Value::Object(obj) = &mut added {
+                            obj.insert("idx".to_string(), Value::Number(serde_json::Number::from(object_index)));
+                            object_index += 1;
+                        }
+                    }
+                    
+                    result.push(added);
                 }
             }
             

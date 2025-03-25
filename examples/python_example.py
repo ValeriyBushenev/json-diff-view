@@ -22,6 +22,13 @@ def example_with_strings():
     # Print the result
     print("Comparing JSON strings:")
     print(result)
+    
+    # Compare with array indexes included
+    result_with_idx = json_diff_view.compare_json_strings(before_json, after_json, add_idx=True)
+    
+    # Print the result with indexes
+    print("\nComparing JSON strings with array indexes:")
+    print(result_with_idx)
 
 def example_with_objects():
     """Example comparing Python objects"""
@@ -55,6 +62,13 @@ def example_with_objects():
     # Print the result
     print("Comparing Python objects:")
     print(result)
+    
+    # Compare with array indexes included
+    result_with_idx = json_diff_view.compare_json_values(before_obj, after_obj, add_idx=True)
+    
+    # Print the result with indexes
+    print("\nComparing Python objects with array indexes:")
+    print(result_with_idx)
 
 def example_with_files():
     """Example comparing JSON files"""
@@ -93,6 +107,13 @@ def example_with_files():
         # Print the result
         print(f"Comparing files {before_file} and {after_file}:")
         print(result)
+        
+        # Compare files with array indexes included
+        result_with_idx = json_diff_view.compare_json_files(before_file, after_file, add_idx=True)
+        
+        # Print the result with indexes
+        print(f"\nComparing files with array indexes:")
+        print(result_with_idx)
 
 def main():
     """Run all examples"""

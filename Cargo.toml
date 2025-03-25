@@ -1,6 +1,6 @@
 [package]
 name = "json-diff-view"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Your Name <your.email@example.com>"]
 description = "A tool for visually displaying differences between JSON files in a human-readable format"

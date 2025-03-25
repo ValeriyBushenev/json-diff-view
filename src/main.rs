@@ -3,7 +3,6 @@
 use json_diff_view::{compare_json, format_diff_to_string};
 use std::fs;
 use std::error::Error;
-use std::env;
 use clap::{Parser, ArgAction};
 use serde_json::Value;
 
@@ -22,6 +21,10 @@ struct Cli {
     /// Output raw JSON diff without formatting
     #[arg(short, long, action = ArgAction::SetTrue)]
     raw: bool,
+
+    /// Add auto-incremental index field to objects in arrays
+    #[arg(long, action = ArgAction::SetTrue)]
+    add_idx: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -42,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .map_err(|e| format!("Failed to parse JSON from {}: {}", cli.after_file, e))?;
     
     // Compare JSON structures
-    let result = compare_json(&before, &after);
+    let result = compare_json(&before, &after, Some(cli.add_idx));
     
     // Format and output the result
     if cli.raw {

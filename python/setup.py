@@ -4,7 +4,7 @@ import os
 import sys
 
 # Версия для удобного обновления
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 PACKAGE_NAME = "json-diff-view"
 
 # Определяем путь к корню проекта (относительно этого файла)
