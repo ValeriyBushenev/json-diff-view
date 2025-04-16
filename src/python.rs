@@ -3,7 +3,6 @@
 
 use std::fs;
 use pyo3::prelude::*;
-use pyo3::types::PyDict;
 use pyo3::exceptions::PyValueError;
 use serde_json::Value;
 
