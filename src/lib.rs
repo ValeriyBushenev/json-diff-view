@@ -27,9 +27,9 @@ use pyo3::prelude::*;
 
 #[cfg(feature = "python-bindings")]
 #[pymodule]
-fn json_diff_view(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(python::compare_json_strings, m)?)?;
-    m.add_function(wrap_pyfunction!(python::compare_json_files, m)?)?;
-    m.add_function(wrap_pyfunction!(python::compare_json_values, m)?)?;
+fn json_diff_view(py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(python::compare_json_strings, py)?)?;
+    m.add_function(wrap_pyfunction!(python::compare_json_files, py)?)?;
+    m.add_function(wrap_pyfunction!(python::compare_json_values, py)?)?;
     Ok(())
 }
